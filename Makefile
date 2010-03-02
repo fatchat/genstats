@@ -19,14 +19,17 @@ vpath %.cpp io:main
 #vpath %.o $(OBJDIR)
 
 # libs
-IO_OBJS = cqdata.o
+IO_OBJS = cqinput.o
 
 # targets
 CQTEST_OBJS = cqtest.o
-
 cqtestOBJS = $(patsubst %, $(OBJDIR)/%, $(CQTEST_OBJS))
 
+T2B_OBJS = text2bin.o
+text2binOBJS = $(patsubst %, $(OBJDIR)/%, $(T2B_OBJS))
+
 TARGETS = cqtest \
+	text2bin
 
 libioOBJS = $(patsubst %, $(OBJDIR)/%, $(IO_OBJS))
 
