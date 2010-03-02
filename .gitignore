@@ -1,5 +1,8 @@
 *.data
 *.o
 *~
-
+bin
+data
+lib
+objectfiles
 
