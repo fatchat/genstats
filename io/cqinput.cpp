@@ -57,7 +57,10 @@ bool CqInput::readData_(const char* infile)
       return false;
     }
     LinAlg::Vector v(las_);
-    std::copy(buf.get(), buf.get() + line_size, v.begin());
+    for(int i = 0; i < line_size; ++i) {
+      v[i] = *(buf.get() + i);
+      //      v[i] -= 1;
+    }
   }
   fclose(fp);
   return true;
