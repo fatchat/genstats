@@ -9,17 +9,23 @@ CFLAGS = -Wall -c $(DEBUG) $(INCLUDE) $(PROFILE)
 LFLAGS = -Wall $(DEBUG) $(PROFILE) -L$(PWD)/lib
 
 OTHERLIBS = 
-MYLIBS = -lio
+MYLIBS = -lio -lmath
 
 MYLIBDIR = lib
 OBJDIR = objectfiles
 BINDIR = bin
 
-vpath %.cpp io:main
+vpath %.cpp io:main:math
 #vpath %.o $(OBJDIR)
 
 # libs
 IO_OBJS = cqinput.o
+libioOBJS = $(patsubst %, $(OBJDIR)/%, $(IO_OBJS))
+
+MATH_OBJS = linalg.o
+libmathOBJS = $(patsubst %, $(OBJDIR)/%, $(MATH_OBJS))
+
+LIBTARGETS = libio libmath
 
 # targets
 CQTEST_OBJS = cqtest.o
@@ -28,12 +34,12 @@ cqtestOBJS = $(patsubst %, $(OBJDIR)/%, $(CQTEST_OBJS))
 T2B_OBJS = text2bin.o
 text2binOBJS = $(patsubst %, $(OBJDIR)/%, $(T2B_OBJS))
 
+LINALG_OBJS = linalgtest.o
+linalgOBJS = $(patsubst %, $(OBJDIR)/%, $(LINALG_OBJS))
+
 TARGETS = cqtest \
-	text2bin
-
-libioOBJS = $(patsubst %, $(OBJDIR)/%, $(IO_OBJS))
-
-LIBTARGETS = libio
+	text2bin \
+	linalg
 
 .PHONY: clean all libs
 all : libs $(TARGETS)
