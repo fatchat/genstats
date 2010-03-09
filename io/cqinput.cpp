@@ -44,7 +44,6 @@ bool CqInput::readData_(const char* infile)
 	      << std::endl;
     return false;
   }
-  size_t las_index = 0;
   boost::shared_ptr<input_type> buf(new input_type[line_size]);
   while(1) {
     const int nread = fread(buf.get(), elem_size, line_size, fp);
@@ -57,9 +56,7 @@ bool CqInput::readData_(const char* infile)
       fclose(fp);
       return false;
     }
-    las_index = las_.create_and_store_vector();
-    LAS::vector_type& v = las_.access_vector_ref(las_index);
-    assert(v.size() == size_t(line_size));
+    LinAlg::Vector v(las_);
     std::copy(buf.get(), buf.get() + line_size, v.begin());
   }
   fclose(fp);

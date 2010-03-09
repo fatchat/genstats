@@ -1,11 +1,11 @@
 #ifndef CQINPUT_H
 #define CQINPUT_H
 
-#include "mathutils/linalg.h"
+#include "math/linalg.h"
 
 class CqInput {
   typedef short input_type;
-  typedef LinAlgSys<input_type> LAS;
+  typedef LinAlg::System LAS;
   LAS las_;
   bool valid_;
 
