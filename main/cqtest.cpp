@@ -15,10 +15,8 @@ int main(int argc, char* argv[])
     printf("read failed\n");
     return 1;
   }
-  printf("cq dimension is %d\n", (int)cqinput.las().dim);
+  printf("cq dimension is %d\n", (int)cqinput.las().dim());
   printf("created %d vectors\n", (int)cqinput.las().n_vectors());
-
-  printf("norm of element 0 is %d\n", (int)cqinput.las().norm(0));
 
   return 0;
 }
