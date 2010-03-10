@@ -8,7 +8,7 @@ PROFILE =
 CFLAGS = -Wall -c $(DEBUG) $(INCLUDE) $(PROFILE)
 LFLAGS = -Wall $(DEBUG) $(PROFILE) -L$(PWD)/lib
 
-OTHERLIBS = 
+OTHERLIBS = -lz
 MYLIBS = -lio -lmath
 
 MYLIBDIR = lib
@@ -19,7 +19,7 @@ vpath %.cpp io:main:math
 #vpath %.o $(OBJDIR)
 
 # libs
-IO_OBJS = cqinput.o
+IO_OBJS = cqinput.o zlib_infdef.o
 libioOBJS = $(patsubst %, $(OBJDIR)/%, $(IO_OBJS))
 
 MATH_OBJS = linalg.o
@@ -37,9 +37,13 @@ text2binOBJS = $(patsubst %, $(OBJDIR)/%, $(T2B_OBJS))
 LINALG_OBJS = linalgtest.o
 linalgOBJS = $(patsubst %, $(OBJDIR)/%, $(LINALG_OBJS))
 
+ZLIBTEST_OBJS = zlibtest.o
+zlibtestOBJS = $(patsubst %, $(OBJDIR)/%, $(ZLIBTEST_OBJS))
+
 TARGETS = cqtest \
 	text2bin \
-	linalg
+	linalg \
+	zlibtest
 
 .PHONY: clean all libs
 all : libs $(TARGETS)
