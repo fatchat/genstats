@@ -1,24 +1,35 @@
 #ifndef CQINPUT_H
 #define CQINPUT_H
 
+#include <cstdio>
 #include "math/linalg.h"
 
-class CqInput {
-  typedef short input_type;
-  typedef LinAlg::System LAS;
-  LAS las_;
-  bool valid_;
-
+// ============================= CqFile ==============================
+class CqFile {
+  FILE* fp_;
  public:
-  CqInput(const char* infile);
-  const LAS& las() const { return las_; }
-  LAS& las_ref() { return las_; }
-  bool valid() const { return valid_; }
-
- private:
-  bool readData_(const char*);
+  CqFile(const char*);
+  ~CqFile();
+  FILE* fp();
 };
 
-size_t get_dim(const char*);
+// ============================= CqInput ==============================
+class CqInput {
+
+  typedef short input_type;
+
+  int elem_sz_;
+  int line_sz_;
+  LinAlg::System las_;
+
+ public:
+  CqInput(CqFile&);
+  const LinAlg::System& las() const { return las_; }
+  LinAlg::System& las_ref() { return las_; }
+
+ private:
+  size_t get_dim_(FILE*);
+  void readData_(FILE*);
+};
 
 #endif // CQINPUT_H

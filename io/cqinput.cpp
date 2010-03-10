@@ -1,67 +1,77 @@
 #include "io/cqinput.h"
 
-#include <iostream>
+#include <stdexcept>
+#include <sstream>
 #include <fstream>
 #include <boost/smart_ptr.hpp>
 
-size_t get_dim(const char* infile)
+// ============================= CqFile ==============================
+CqFile::CqFile(const char* filename)
 {
-  FILE* fp = fopen(infile, "r");
-  if(!fp) {
-    std::cerr << "could not open input file " << infile << " for reading.\n";
-    return 0;
+  fp_ = fopen(filename, "r");
+  if(!fp_) {
+    throw std::runtime_error(std::string("could not open ") + filename + " for reading");
   }
-  int sz = 0;
-  int dim = 0;
-  fread(&sz, sizeof(int), 1, fp);
-  fread(&dim, sizeof(int), 1, fp);
-  fclose(fp);
-  //printf("read sz=%d and dim=%d from %s\n", sz, dim, infile);
-  return (size_t)dim;
 }
 
-CqInput::CqInput(const char* infile)
-  : las_(get_dim(infile))
+CqFile::~CqFile()
 {
-  valid_ = readData_(infile);
+  if(fp_) { fclose(fp_); fp_ = 0; }
 }
 
-bool CqInput::readData_(const char* infile)
+FILE* CqFile::fp()
 {
-  FILE* fp = fopen(infile, "r");
-  if(!fp) {
-    std::cerr << "could not open input file " << infile << " for reading.\n";
-    return false;
-  }
+  // want something like:
+  // FILE* outfp;
+  // if(Zlib::def(fp_, outfp)) {
+  //    return outfp;
+  // }
+  // could use a temp file, but that kinda defeats the purpose...
+  
+  return fp_;
+}
 
-  int elem_size = 0;
-  int line_size = 0;
-  fread(&elem_size, sizeof(int), 1, fp);
-  fread(&line_size, sizeof(int), 1, fp);
-  if(elem_size != sizeof(input_type)) {
-    std::cerr << "input file in the wrong format: "
-	      << elem_size << " should be " << sizeof(input_type)
-	      << std::endl;
-    return false;
+// ============================= CqInput ==============================
+size_t CqInput::get_dim_(FILE* fp)
+{
+  fread(&elem_sz_, sizeof(int), 1, fp);
+  fread(&line_sz_, sizeof(int), 1, fp);
+  //printf("get_dim_() read sz=%d and dim=%d\n", elem_sz_, line_sz_);
+  if(elem_sz_ != sizeof(input_type)) {
+    std::ostringstream error;
+    error << "input file in the wrong format: "
+	  << elem_sz_ << " should be " << sizeof(input_type);
+    throw std::runtime_error(error.str());
   }
-  boost::shared_ptr<input_type> buf(new input_type[line_size]);
+  return (size_t)line_sz_;
+}
+
+CqInput::CqInput(CqFile& cqfile)
+  : elem_sz_(0)
+  , line_sz_(0)
+  , las_(get_dim_(cqfile.fp()))
+{
+  readData_(cqfile.fp());
+}
+
+void CqInput::readData_(FILE* fp)
+{
+  boost::shared_ptr<input_type> buf(new input_type[line_sz_]);
   while(1) {
-    const int nread = fread(buf.get(), elem_size, line_size, fp);
+    const int nread = fread(buf.get(), elem_sz_, line_sz_, fp);
     if(feof(fp)) {
       break;
     }
-    if(nread != line_size) {
-      std::cerr << "encountered line of incorrect length: " << nread
-		<< " instead of " << line_size << std::endl;
-      fclose(fp);
-      return false;
+    if(nread != line_sz_) {
+      std::ostringstream error;
+      error << "encountered line of incorrect length: " << nread
+	    << " instead of " << line_sz_;
+      throw std::runtime_error(error.str());
     }
     LinAlg::Vector v(las_);
-    for(int i = 0; i < line_size; ++i) {
+    for(int i = 0; i < line_sz_; ++i) {
       v[i] = *(buf.get() + i);
       //      v[i] -= 1;
     }
   }
-  fclose(fp);
-  return true;
 }
