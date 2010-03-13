@@ -33,7 +33,7 @@ FILE* CqFile::fp()
   return fp_;
 }
 
-// ============================= CqInput ==============================
+// ============================= free functions ============================
 LinAlg::System::ptr read_data(CqFile& cqfile)
 {
   int line_sz = 0;
@@ -53,6 +53,25 @@ LinAlg::System::ptr read_data(CqFile& cqfile)
     // for(int i = 0; i < line_sz; ++i)  { v[i] -= 1; }
   }
   
+  return las;
+}
+
+LinAlg::System::ptr read_data(CqTextFile& cqtextfile)
+{
+  const size_t dim = cqtextfile.dim();
+  LinAlg::System::ptr las(new LinAlg::System(dim));
+  std::vector<short> input(dim);
+  while(cqtextfile.valid()) {
+    if(dim == cqtextfile.readline(input)) {
+      LinAlg::Vector v(*las);
+      std::copy(input.begin(), input.end(), v.begin());
+    }
+    else {
+      if(cqtextfile.valid()) {
+	throw std::runtime_error("incorrect line length in input file");
+      }
+    }
+  }
   return las;
 }
 
