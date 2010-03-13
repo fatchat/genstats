@@ -2,6 +2,7 @@
 #define LINALG_H
 
 #include <vector>
+#include <boost/smart_ptr.hpp>
 
 namespace LinAlg {
 
@@ -17,6 +18,7 @@ namespace LinAlg {
     typedef const T* const_iterator;
     typedef T&       element_ref;
     typedef const T& const_element_ref;
+    typedef boost::shared_ptr<System> ptr;
 
   private:
     const std::size_t dim_;

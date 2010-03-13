@@ -2,7 +2,10 @@
 #define CQINPUT_H
 
 #include <cstdio>
+#include <stdexcept>
 #include "math/linalg.h"
+
+namespace Cq {
 
 // ============================= CqFile ==============================
 class CqFile {
@@ -11,25 +14,22 @@ class CqFile {
   CqFile(const char*);
   ~CqFile();
   FILE* fp();
+  bool eof() const { return feof(fp_); }
+  template<class T>
+    bool read_bytes(T* buffer, int nElems)
+    {
+      const int nread = fread((void*)buffer, sizeof(T), nElems, fp_);
+      if(eof()) { return false; }
+      if(nread != nElems) {
+	throw std::runtime_error("input file incomplete line");
+      }
+      return true;
+    }
 };
 
-// ============================= CqInput ==============================
-class CqInput {
+// =========================== free functions =======================
+LinAlg::System::ptr read_data(CqFile&);
 
-  typedef short input_type;
-
-  int elem_sz_;
-  int line_sz_;
-  LinAlg::System las_;
-
- public:
-  CqInput(CqFile&);
-  const LinAlg::System& las() const { return las_; }
-  LinAlg::System& las_ref() { return las_; }
-
- private:
-  size_t get_dim_(FILE*);
-  void readData_(FILE*);
-};
+} // namespace
 
 #endif // CQINPUT_H

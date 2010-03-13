@@ -5,6 +5,8 @@
 #include <fstream>
 #include <boost/smart_ptr.hpp>
 
+namespace Cq {
+
 // ============================= CqFile ==============================
 CqFile::CqFile(const char* filename)
 {
@@ -32,46 +34,26 @@ FILE* CqFile::fp()
 }
 
 // ============================= CqInput ==============================
-size_t CqInput::get_dim_(FILE* fp)
+LinAlg::System::ptr read_data(CqFile& cqfile)
 {
-  fread(&elem_sz_, sizeof(int), 1, fp);
-  fread(&line_sz_, sizeof(int), 1, fp);
-  //printf("get_dim_() read sz=%d and dim=%d\n", elem_sz_, line_sz_);
-  if(elem_sz_ != sizeof(input_type)) {
-    std::ostringstream error;
-    error << "input file in the wrong format: "
-	  << elem_sz_ << " should be " << sizeof(input_type);
-    throw std::runtime_error(error.str());
+  int line_sz = 0;
+  int elem_sz = 0;
+
+  cqfile.read_bytes(&elem_sz, 1);
+  cqfile.read_bytes(&line_sz, 1);
+  if(elem_sz != sizeof(short)) {
+    throw std::runtime_error("input file header error");
   }
-  return (size_t)line_sz_;
+  LinAlg::System::ptr las(new LinAlg::System(line_sz));
+
+  boost::shared_array<short> buf(new short[line_sz]);
+  while(cqfile.read_bytes(buf.get(), line_sz)) {
+    LinAlg::Vector v(*las);
+    std::copy(buf.get(), buf.get() + line_sz, v.begin());
+    // for(int i = 0; i < line_sz; ++i)  { v[i] -= 1; }
+  }
+  
+  return las;
 }
 
-CqInput::CqInput(CqFile& cqfile)
-  : elem_sz_(0)
-  , line_sz_(0)
-  , las_(get_dim_(cqfile.fp()))
-{
-  readData_(cqfile.fp());
-}
-
-void CqInput::readData_(FILE* fp)
-{
-  boost::shared_ptr<input_type> buf(new input_type[line_sz_]);
-  while(1) {
-    const int nread = fread(buf.get(), elem_sz_, line_sz_, fp);
-    if(feof(fp)) {
-      break;
-    }
-    if(nread != line_sz_) {
-      std::ostringstream error;
-      error << "encountered line of incorrect length: " << nread
-	    << " instead of " << line_sz_;
-      throw std::runtime_error(error.str());
-    }
-    LinAlg::Vector v(las_);
-    for(int i = 0; i < line_sz_; ++i) {
-      v[i] = *(buf.get() + i);
-      //      v[i] -= 1;
-    }
-  }
-}
+} // namespace

@@ -13,16 +13,12 @@ int main(int argc, char* argv[])
   }
   printf("reading input file %s\n", argv[1]);
   try {
-    CqFile cqfile(argv[1]);
-    CqInput cqinput(cqfile);
+    Cq::CqFile cqfile(argv[1]);
     
-    printf("cq dimension is %d\n", (int)cqinput.las().dim());
-    printf("created %d vectors\n", (int)cqinput.las().n_vectors());
-
-    LinAlg::System& las = cqinput.las_ref();
+    LinAlg::System::ptr las = Cq::read_data(cqfile);
     std::vector<double> norms;
-    for(size_t i = 0; i < las.n_vectors(); ++i) {
-      norms.push_back(LinAlg::norm(las, i));
+    for(size_t i = 0; i < las->n_vectors(); ++i) {
+      norms.push_back(LinAlg::norm(*las, i));
       //    printf("%4d %3.3f\n", int(i), norms.back());
     }
   
