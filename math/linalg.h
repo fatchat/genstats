@@ -1,6 +1,7 @@
 #ifndef LINALG_H
 #define LINALG_H
 
+#include <cstdio>
 #include <vector>
 #include <boost/smart_ptr.hpp>
 
@@ -79,6 +80,7 @@ namespace LinAlg {
   Vector operator*(double, const Vector&);
   double innerprod(const Vector&, const Vector&);
 
+  void print_int_vector(const Vector& vec, FILE* fp);
 } // namespace LinAlg
 
 #endif // LINALG_H

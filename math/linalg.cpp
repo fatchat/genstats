@@ -125,4 +125,12 @@ namespace LinAlg {
     return w;
   }
 
+  void print_int_vector(const Vector& vec, FILE* fp)
+  {
+    for(System::const_iterator it = vec.begin(); it != vec.end(); ++it) {
+      fprintf(fp, "%d ", (int)*it);
+    }
+    fprintf(fp, "\n");
+  }
+
 } // namespace
