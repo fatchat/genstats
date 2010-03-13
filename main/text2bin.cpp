@@ -6,11 +6,13 @@ typedef short output_type;
 
 int main(int argc, char* argv[])
 {
-  if(argc < 2) {
-    printf("Usage: %s <input filename>\n", argv[0]);
+  if(argc < 3) {
+    printf("Usage: %s <input filename> <dimension> [<shift>=0]\n", argv[0]);
     return 1;
   }
   const char *infile = argv[1];
+  const int dim = atoi(argv[2]);
+  const int shift = (argc == 4) ? atoi(argv[3]) : 0;
 
   FILE* fpin = fopen(infile, "r");
   if(!fpin) {
@@ -27,7 +29,6 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  const int dim = 2000;
   {
     const int sz = sizeof(output_type);
     fwrite(&sz, sizeof(int), 1, fpout);
@@ -43,6 +44,7 @@ int main(int argc, char* argv[])
     if(strlen(buf) != line_len) {
       printf("Incorrect line length encountered: %d instead of %d in [%s]\n",
 	     (int)strlen(buf), (int)line_len, buf);
+      die = true;
       break;
     }
     output_type bin[dim];
@@ -56,20 +58,10 @@ int main(int argc, char* argv[])
 	}
 	break;
       }
-      switch(buf[bufx]) {
-      case '0':
-	bin[binx] = (output_type)-1;
-	break;
-      case '1':
-	bin[binx] = (output_type)0;
-	break;
-      case '2':
-	bin[binx] = (output_type)1;
-	break;
-      default:
-	printf("Encountered unexpected character: [%c]\n", buf[bufx]);
-	die = true;
-	break;
+
+      bin[binx] = (output_type)(buf[bufx] - '0');
+      if(shift) {
+	bin[binx] += shift;
       }
       if(die) break;
       ++binx;
