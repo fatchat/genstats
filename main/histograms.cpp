@@ -4,6 +4,7 @@
 #include <exception>
 
 #include "io/cqinput.h"
+#include "math/buckets.h"
 
 int main(int argc, char* argv[])
 {
@@ -23,39 +24,27 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  // count occurences of -1,0,1 in positions 0..las.dim()-1
-  LinAlg::System buckets(genes->dim());
-  LinAlg::Vector zero(buckets);
-  LinAlg::Vector one(buckets);
-  LinAlg::Vector two(buckets);
+  // count occurences of 0,1,2 in different gene positions
+  Stat::Buckets buckets(genes->dim());
+  const size_t nSymbols = 3;
+  buckets.create(nSymbols);
 
   for(size_t i = 0; i < genes->n_vectors(); ++i) {
     const LinAlg::Vector gene(i, *genes);
-    for(size_t j = 0; j < genes->dim(); ++j) {
-      const int val = (int)gene[j]; // cast from double
-      switch(val) {
-      case 0:
-	++zero[j];
-	break;
-      case 1:
-	++one[j];
-	break;
-      case 2:
-	++two[j];
-	break;
-      default:
-	printf("unknown entry %d at position %d in gene %d\n",
-	       val, (int)j, (int)i);
-	return 1;
-      }
-    }
+    buckets.count(gene);
   }
-  
-  printf("zero: "); LinAlg::print_int_vector(zero, stdout);
-  printf("one: ");  LinAlg::print_int_vector(one, stdout);
-  printf("two: ");  LinAlg::print_int_vector(two, stdout);
 
-  
+  for(size_t i = 0; i < nSymbols; ++i) {
+    printf("%d: ", int(i));
+    buckets.print(i, stdout);
+  }
+
+  if(buckets.verify_sums()) {
+    printf("sums verified\n");
+  }
+  else {
+    printf("sums verification failed\n");
+  }
 
   return 0;
 }
