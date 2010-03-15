@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <fstream>
+#include <cmath>
 #include <algorithm>
 #include <exception>
 
@@ -8,6 +9,8 @@
 
 int main(int argc, char* argv[])
 {
+  bool show_hist = false;
+  bool show_probs = true;
   if(argc < 2) {
     printf("usage: %s <input file>\n", argv[0]);
     return 1;
@@ -34,16 +37,26 @@ int main(int argc, char* argv[])
     buckets.count(gene);
   }
 
+  if(show_hist) {
   for(size_t i = 0; i < nSymbols; ++i) {
     printf("%d: ", int(i));
     buckets.print(i, stdout);
   }
-
-  if(buckets.verify_sums()) {
-    printf("sums verified\n");
   }
-  else {
-    printf("sums verification failed\n");
+
+  assert(buckets.verify_sums());
+
+  if(show_probs) {
+    for(size_t position = 0; position < genes->dim(); ++position) {
+      double psum = 0;
+      for(size_t symbol = 0; symbol < nSymbols; ++symbol) {
+	const double prob = buckets.prob(symbol, position);
+	printf("P[X_%d = %d] = %1.3f\n", (int)position, (int)symbol, prob);
+	psum += prob;
+      }
+      assert(fabs(psum - 1.0) < 1e-10);
+      printf("\n");
+    }
   }
 
   return 0;
