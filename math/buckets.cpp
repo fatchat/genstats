@@ -7,6 +7,7 @@ namespace Stat {
   Buckets::Buckets(size_t dim)
     : buckets_(dim)
     , created_(false)
+    , column_total_(0)
   { }
 
   void Buckets::create(size_t n)
@@ -41,7 +42,7 @@ namespace Stat {
     LinAlg::print_int_vector(v, fp);
   }
 
-  bool Buckets::verify_sums() const
+  bool Buckets::verify_sums(bool die)
   {
     const size_t n = buckets_.n_vectors();
     const size_t d = buckets_.dim();
@@ -55,10 +56,27 @@ namespace Stat {
 	actual = sum;
       }
       else if(sum != actual) {
+	if(die) {
+	  throw std::runtime_error("Stat::Buckets::verify_sums() failed");
+	}
 	return false;
       }
     }
+    column_total_ = actual;
     return true;
+  }
+
+  size_t Buckets::frequency(size_t symbol, size_t position) const
+  {
+    return *(buckets_.begin(symbol) + position);
+  }
+
+  double Buckets::prob(size_t symbol, size_t position)
+  {
+    if(!column_total_) {
+      verify_sums(true);
+    }
+    return 1.0 * frequency(symbol, position) / column_total_;
   }
 
 } // namespace
