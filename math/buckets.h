@@ -19,7 +19,7 @@ namespace Stat {
     void print(size_t, FILE*);
     bool verify_sums(bool die=false);
     size_t frequency(size_t symbol, size_t position) const;
-    double prob(size_t symbol, size_t position);
+    double prob(size_t symbol, size_t position) const;
   };
 
 } // namespace

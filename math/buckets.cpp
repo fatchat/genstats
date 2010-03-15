@@ -71,10 +71,10 @@ namespace Stat {
     return *(buckets_.begin(symbol) + position);
   }
 
-  double Buckets::prob(size_t symbol, size_t position)
+  double Buckets::prob(size_t symbol, size_t position) const
   {
     if(!column_total_) {
-      verify_sums(true);
+      return -1.0;
     }
     return 1.0 * frequency(symbol, position) / column_total_;
   }
