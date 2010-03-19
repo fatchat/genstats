@@ -9,13 +9,13 @@ CFLAGS = -Wall -c $(DEBUG) $(INCLUDE) $(PROFILE)
 LFLAGS = -Wall $(DEBUG) $(PROFILE) -L$(PWD)/lib
 
 OTHERLIBS = -lz
-MYLIBS = -lio -lmath
+MYLIBS = -lio -lmath -lutil
 
 MYLIBDIR = lib
 OBJDIR = objectfiles
 BINDIR = bin
 
-vpath %.cpp io:main:math
+vpath %.cpp io:main:math:util
 #vpath %.o $(OBJDIR)
 
 # libs
@@ -25,7 +25,10 @@ libioOBJS = $(patsubst %, $(OBJDIR)/%, $(IO_OBJS))
 MATH_OBJS = linalg.o buckets.o entropy.o
 libmathOBJS = $(patsubst %, $(OBJDIR)/%, $(MATH_OBJS))
 
-LIBTARGETS = libio libmath
+UTIL_OBJS = get_opt.o
+libutilOBJS = $(patsubst %, $(OBJDIR)/%, $(UTIL_OBJS))
+
+LIBTARGETS = libio libmath libutil
 
 # targets
 CQTEST_OBJS = cqtest.o
