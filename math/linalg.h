@@ -7,8 +7,6 @@
 
 namespace LinAlg {
 
-  class Vector;
-
   // ============================ System  ==============================
   class System {
     
@@ -36,12 +34,12 @@ namespace LinAlg {
     size_t n_vectors() const { return next_index_; }
     
     size_t create();
-    Vector vec(size_t);
 
     const_iterator begin(size_t n) const;
     iterator begin(size_t n);
 
   private:
+    void index_check_(size_t) const;
     // no impl
     System();
     System(const System&);
@@ -49,9 +47,23 @@ namespace LinAlg {
 
   }; // System
 
+  // ========================== VectorBase =============================
+  class VectorBase {
+  protected:
+    const size_t pos_;
+  public:
+    VectorBase(size_t pos) : pos_(pos) { }
+    virtual ~VectorBase() { }
+    virtual size_t dim() const = 0;
+    virtual void index_check_(size_t) const = 0;
+    virtual System::const_element_ref operator[](size_t n) const = 0;
+    virtual System::const_iterator begin() const = 0;
+    virtual System::const_iterator end() const = 0;
+    virtual bool operator==(const VectorBase&) const = 0;
+  };
+
   // ============================ Vector  ==============================
-  class Vector {
-    size_t pos_;
+ class Vector : public VectorBase {
     System& las_;
 
     // no impl
@@ -61,7 +73,7 @@ namespace LinAlg {
     Vector(size_t pos, System&);
     Vector(System&);
     Vector(const Vector&);
-
+    size_t dim() const { return las_.dim(); }
     System::const_element_ref operator[](size_t n) const;
     System::element_ref operator[](size_t n);
 
@@ -71,8 +83,33 @@ namespace LinAlg {
     System::const_iterator end() const;
     System::iterator end();
 
-    bool operator==(const Vector&) const;
+    bool operator==(const VectorBase&) const;
+
+  private:
+    virtual void index_check_(size_t) const;
   }; // Vector
+
+  // ============================ ConstVector  ==============================
+ class ConstVector : public VectorBase {
+    const System& las_;
+
+    // no impl
+    ConstVector();
+    ConstVector& operator=(const ConstVector&);
+  public:
+    ConstVector(size_t pos, const System&);
+    ConstVector(const ConstVector&);
+    size_t dim() const { return las_.dim(); }
+
+    System::const_element_ref operator[](size_t n) const;
+    System::const_iterator begin() const;
+    System::const_iterator end() const;
+
+    bool operator==(const VectorBase&) const;
+
+  private:
+    virtual void index_check_(size_t) const;
+  }; // ConstVector
 
   // ========================= free functions ============================
   double norm(const Vector&);
@@ -80,7 +117,7 @@ namespace LinAlg {
   Vector operator*(double, const Vector&);
   double innerprod(const Vector&, const Vector&);
 
-  void print_int_vector(const Vector& vec, FILE* fp);
+  void print_int_vector(const VectorBase& vec, FILE* fp);
 } // namespace LinAlg
 
 #endif // LINALG_H
