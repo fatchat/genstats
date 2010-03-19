@@ -4,24 +4,26 @@
 
 namespace Stat {
 
-  Buckets::Buckets(size_t dim)
-    : buckets_(dim)
+  Buckets::Buckets(size_t npositions, size_t nletters)
+    : buckets_(npositions)
     , created_(false)
     , column_total_(0)
-  { }
+  {
+    create_(nletters);
+  }
 
-  void Buckets::create(size_t n)
+  void Buckets::create_(size_t nletters)
   {
     if(created_) {
       throw std::runtime_error("called Stat::Buckets::create() twice");
     }
-    while(n--) {
+    while(nletters--) {
       buckets_.create();
     }
     created_ = true;
   }
 
-  void Buckets::count(const LinAlg::Vector& v)
+  void Buckets::count(const LinAlg::VectorBase& v)
   {
     size_t d = buckets_.dim();
     do {
@@ -38,7 +40,7 @@ namespace Stat {
     if(n < 0 || n >= buckets_.n_vectors()) {
       throw std::runtime_error("index out of range in Stat::Buckets::print");
     }
-    LinAlg::Vector v(n, buckets_);
+    LinAlg::ConstVector v(n, buckets_);
     LinAlg::print_int_vector(v, fp);
   }
 
