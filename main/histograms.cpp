@@ -47,18 +47,18 @@ int main(int argc, char* argv[])
   Stat::Buckets buckets(genes->dim(), nSymbols);
 
   for(size_t i = 0; i < genes->n_vectors(); ++i) {
-    const LinAlg::Vector gene(i, *genes);
+    const LinAlg::ConstVector gene(i, *genes);
     buckets.count(gene);
   }
 
   if(show_hist) {
-  for(size_t i = 0; i < nSymbols; ++i) {
-    printf("%d: ", int(i));
-    buckets.print(i, stdout);
-  }
+    for(size_t i = 0; i < nSymbols; ++i) {
+      printf("%d: ", int(i));
+      buckets.print(i, stdout);
+    }
   }
 
-  buckets.verify_sums(true);
+  buckets.verify_sums(/* die on fail = */ true);
 
   if(show_probs) {
     for(size_t position = 0; position < genes->dim(); ++position) {
@@ -73,10 +73,5 @@ int main(int argc, char* argv[])
     }
   }
 
-  Stat::EntropyCalculator entropy_calc(nSymbols, genes);
-  const double entropy = entropy_calc.entropy();
-  printf("entropy for %d genes: %f\n", (int)genes->n_vectors(), entropy);
-  const double should_be_one = entropy_calc.prob_check();
-  printf("should be 1 => %f\n", should_be_one);
   return 0;
 }

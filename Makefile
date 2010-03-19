@@ -46,11 +46,15 @@ zlibtestOBJS = $(patsubst %, $(OBJDIR)/%, $(ZLIBTEST_OBJS))
 HIST_OBJS = histograms.o
 histogramsOBJS = $(patsubst %, $(OBJDIR)/%, $(HIST_OBJS))
 
+ENT_TEST_OBJS = ent_test.o
+ent_testOBJS = $(patsubst %, $(OBJDIR)/%, $(ENT_TEST_OBJS))
+
 TARGETS = cqtest \
 	text2bin \
 	linalg \
 	zlibtest \
-	histograms
+	histograms \
+	ent_test \
 
 .PHONY: clean all libs
 all : libs $(TARGETS)
