@@ -14,7 +14,7 @@ int main()
   assert(first == 0);
   assert(las.n_vectors() == 1);
 
-  LinAlg::Vector v = las.vec(first);
+  LinAlg::Vector v(first, las);
   // check Vector::operator[]
   for(size_t i = 0; i < dim; ++i) {
     v[i] = 0.1 * i;
@@ -76,7 +76,7 @@ int main()
   assert(LinAlg::norm(v) == LinAlg::norm(las, first));
 
   // check norm
-  LinAlg::Vector w = las.vec(las.create());
+  LinAlg::Vector w(las);
   assert(las.n_vectors() == 8);
   assert(LinAlg::norm(w) == 0.0);
   
