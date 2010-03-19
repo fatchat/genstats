@@ -118,6 +118,8 @@ namespace LinAlg {
   double innerprod(const Vector&, const Vector&);
 
   void print_int_vector(const VectorBase& vec, FILE* fp);
+  size_t count_letters(const System&);
+
 } // namespace LinAlg
 
 #endif // LINALG_H

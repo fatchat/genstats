@@ -4,6 +4,7 @@
 #include <functional>
 #include <cmath>
 #include <stdexcept>
+#include <map>
 
 #include "math/linalg.h"
 
@@ -192,6 +193,19 @@ namespace LinAlg {
       fprintf(fp, "%d ", (int)*it);
     }
     fprintf(fp, "\n");
+  }
+
+  size_t count_letters(const System& las)
+  {
+    std::map<size_t, bool> letters;
+    for(size_t i = 0; i < las.n_vectors(); ++i) {
+      ConstVector v(i, las);
+      for(size_t j = 0; j < v.dim(); ++j) {
+	size_t el = v[j];
+	letters[el] = true;
+      }
+    }
+    return letters.size();
   }
 
 } // namespace
