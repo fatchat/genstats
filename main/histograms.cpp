@@ -3,23 +3,38 @@
 #include <cmath>
 #include <algorithm>
 #include <exception>
+#include <iostream>
 
 #include "io/cqinput.h"
 #include "math/buckets.h"
+#include "math/entropy.h"
+#include "util/get_opt.h"
 
 int main(int argc, char* argv[])
 {
-  bool show_hist = false;
-  bool show_probs = true;
-  if(argc < 2) {
-    printf("usage: %s <input file>\n", argv[0]);
-    return 1;
+  Getopt getopt;
+  getopt.addOption("history", Option::NO_ARG);
+  getopt.addOption("probs", Option::NO_ARG);
+  getopt.addToHelp(" <input file>");
+  if (getopt.processOpts(argc, argv)) {
+    getopt.showHelp(std::cout);
+    exit(1);
   }
+
+  if(argc - getopt.first_non_opt() != 1) {
+    getopt.showHelp(std::cout);
+    exit(1);
+  }
+
+  const char* filename = argv[getopt.first_non_opt()];
+  const bool show_hist = getopt.getOption('h').is_set();
+  const bool show_probs = getopt.getOption('p').is_set();
+
   // read data, create System pointer
-  printf("reading input file %s\n", argv[1]);
+  printf("reading input file %s\n", filename);
   LinAlg::System::ptr genes;
   try {
-    Cq::CqFile cqfile(argv[1]);
+    Cq::CqFile cqfile(filename);
     genes = Cq::read_data(cqfile);
   }
   catch(std::exception& e) {
@@ -28,9 +43,8 @@ int main(int argc, char* argv[])
   }
 
   // count occurences of 0,1,2 in different gene positions
-  Stat::Buckets buckets(genes->dim());
   const size_t nSymbols = 3;
-  buckets.create(nSymbols);
+  Stat::Buckets buckets(genes->dim(), nSymbols);
 
   for(size_t i = 0; i < genes->n_vectors(); ++i) {
     const LinAlg::Vector gene(i, *genes);
@@ -44,7 +58,7 @@ int main(int argc, char* argv[])
   }
   }
 
-  assert(buckets.verify_sums());
+  buckets.verify_sums(true);
 
   if(show_probs) {
     for(size_t position = 0; position < genes->dim(); ++position) {
@@ -59,5 +73,10 @@ int main(int argc, char* argv[])
     }
   }
 
+  Stat::EntropyCalculator entropy_calc(nSymbols, genes);
+  const double entropy = entropy_calc.entropy();
+  printf("entropy for %d genes: %f\n", (int)genes->n_vectors(), entropy);
+  const double should_be_one = entropy_calc.prob_check();
+  printf("should be 1 => %f\n", should_be_one);
   return 0;
 }
