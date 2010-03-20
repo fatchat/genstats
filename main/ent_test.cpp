@@ -4,6 +4,7 @@
 
 #include "io/cqinput.h"
 #include "math/entropy.h"
+#include "math/ptree.h"
 #include "util/get_opt.h"
 
 int main(int argc, char* argv[])
@@ -33,8 +34,18 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  const size_t nSymbols = 3;
+  Stat::PTree tree;
+  printf("adding vectors to tree\n");
+  tree.add_vectors(*genes);
+  printf("calculating probabilities\n");
+  tree.calc_probs();
+  printf("running show_probs\n");
+  tree.show_probs(stdout);
 
+  printf("quitting\n");
+  return 0;
+
+  const size_t nSymbols = LinAlg::count_letters(*genes);
   Stat::EntropyCalculator entropy_calc(nSymbols, genes);
 
   const double entropy = entropy_calc.entropy();
