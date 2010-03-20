@@ -22,7 +22,7 @@ vpath %.cpp io:main:math:util
 IO_OBJS = cqinput.o zlib_infdef.o
 libioOBJS = $(patsubst %, $(OBJDIR)/%, $(IO_OBJS))
 
-MATH_OBJS = linalg.o buckets.o entropy.o
+MATH_OBJS = linalg.o buckets.o entropy.o ptree.o
 libmathOBJS = $(patsubst %, $(OBJDIR)/%, $(MATH_OBJS))
 
 UTIL_OBJS = get_opt.o
