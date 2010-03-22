@@ -49,12 +49,16 @@ histogramsOBJS = $(patsubst %, $(OBJDIR)/%, $(HIST_OBJS))
 ENT_TEST_OBJS = ent_test.o
 ent_testOBJS = $(patsubst %, $(OBJDIR)/%, $(ENT_TEST_OBJS))
 
+PTREETEST_OBJS = ptreetest.o
+ptreetestOBJS = $(patsubst %, $(OBJDIR)/%, $(PTREETEST_OBJS))
+
 TARGETS = cqtest \
 	text2bin \
 	linalg \
 	zlibtest \
 	histograms \
 	ent_test \
+	ptreetest \
 
 .PHONY: clean all libs
 all : libs $(TARGETS)
