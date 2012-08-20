@@ -52,13 +52,17 @@ ent_testOBJS = $(patsubst %, $(OBJDIR)/%, $(ENT_TEST_OBJS))
 PTREETEST_OBJS = ptreetest.o
 ptreetestOBJS = $(patsubst %, $(OBJDIR)/%, $(PTREETEST_OBJS))
 
+DIFFTEST_OBJS = difftest.o
+difftestOBJS = $(patsubst %, $(OBJDIR)/%, $(DIFFTEST_OBJS))
+
 TARGETS = cqtest \
 	text2bin \
 	linalg \
-	zlibtest \
 	histograms \
 	ent_test \
 	ptreetest \
+	difftest \
+#	zlibtest \
 
 .PHONY: clean all libs
 all : libs $(TARGETS)
@@ -80,7 +84,7 @@ $(TARGETS):
 
 $(foreach lib,$(LIBTARGETS),$(eval $(call get_object_files,$(lib))))
 $(LIBTARGETS):
-	libtool -static -o $(MYLIBDIR)/$@.a $^
+	ar rcs $(MYLIBDIR)/$@.a $^
 
 $(OBJDIR)/%.o : %.cpp
 	$(CC) $(CFLAGS) $< -o $@

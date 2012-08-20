@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <cstdlib>
 
 typedef short output_type;
 

@@ -20,6 +20,24 @@ namespace LinAlg {
     return next_index_++;
   }
 
+  size_t System::difference(size_t index_1, size_t index_2)
+  {
+    index_check_(index_1);
+    index_check_(index_2);
+
+    const size_t diff_index = this->create();
+
+    LinAlg::ConstVector v1(index_1, *this);
+    LinAlg::ConstVector v2(index_2, *this);
+    LinAlg::Vector v_diff(diff_index, *this);
+
+    for (size_t i_d = 0; i_d < dim_; ++i_d) {
+      v_diff[i_d] = v1[i_d] - v2[i_d];
+    }
+
+    return diff_index;
+  }
+
   void System::index_check_(size_t n) const
   {
     if(n >= next_index_) {

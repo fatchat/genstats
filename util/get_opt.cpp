@@ -42,57 +42,78 @@ int Getopt::processOpts(int argc, char* argv[])
 {
   usage_ = "usage: ";
   usage_ += argv[0];
+
   std::string shortString;
+
   for(std::map<char, Option>::const_iterator i = options_.begin();
-      i != options_.end(); ++i)
+      i != options_.end(); 
+	  ++i)
   {
     const Option& opt = i->second;
+
     shortString += opt.shortOpt();
+
     if (opt.hasArg()) {
       shortString += ':';
     }
   }
+
   std::vector<option> options_vector;
+
   for(std::map<char, Option>::iterator i = options_.begin();
-      i != options_.end(); ++i) {
-    options_vector.push_back(i->second.longOpt());
-  }
+      i != options_.end(); 
+	  ++i) 
+	{
+	  options_vector.push_back(i->second.longOpt());
+	}
+
   while (1) {
+
     int indexPtr;
+
     const int ret
       = getopt_long(argc, argv,
 		    shortString.c_str(),
 		    &options_vector[0],
 		    &indexPtr);
+
     if (ret < 0) {
       break;
     }
+
     if (ret == int('?')) {
       //std::cout << "ERROR: encountered an unknown option\n";
       return 1;
     }
+
     //std::cout << "encountered " << (char)ret << std::endl;
     Option& the_option = options_[(char)ret];
+
     the_option.SET();
+
     if (the_option.hasArg()) {
       //std::cout << "   argument=" << optarg << std::endl;
       the_option.SET_ARG(optarg);
     }
   }
+
   return 0;
 }
 
 void Getopt::showHelp(std::ostream& os)
 {
   for(std::map<char, Option>::iterator i = options_.begin();
-      i != options_.end(); ++i)
+      i != options_.end();
+	  ++i)
   {
     Option& opt = i->second;
     opt.make_usage();
     usage_ += opt.usage_;
   }
+
   usage_ += tail_;
   usage_ += "\n";
+
   os << usage_;
 }
 

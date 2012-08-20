@@ -33,7 +33,11 @@ namespace LinAlg {
     size_t dim() const { return dim_; }
     size_t n_vectors() const { return next_index_; }
     
+    // create new vector and return new index
     size_t create();
+
+    // create difference and return new index
+    size_t difference(size_t index_1, size_t index_2);
 
     const_iterator begin(size_t n) const;
     iterator begin(size_t n);
